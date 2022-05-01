@@ -8,8 +8,12 @@ A biblioteca é construída e publicada usando o poetry, uma ferramenta de isola
 
 Passos para instalação do poetry (https://python-poetry.org/docs/master/#installing-with-the-official-installer):
 1. curl -sSL https://install.python-poetry.org | python3 -
-2. export PATH="/$HOME/.local/bin:$PATH
+2. export PATH="/$HOME/.local/bin:$PATH"
 3. poetry --version
+
+Para controle de qualidade de código combinamos a análise de projeto de algoritmos derivada da experiência da professora orientadora do TCC e o uso do flake8, uma ferramenta para qualidade de código em Python.
+
+Para realizar teste de funções que aplicam algoritmos de coloração usamos a ferramenta pytest. Os testes do projeto estão contidos em `algotoca/tests`.
 
 Algoritmos já implementados no pacote:
 1. Algoritmos de coloração heurísticos gulosos:
