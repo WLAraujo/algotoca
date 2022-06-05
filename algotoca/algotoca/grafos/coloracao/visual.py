@@ -8,7 +8,6 @@ class Visual():
         A classe permite tanto mostrar o grafo colorido quanto exportá-lo como imagem.
     '''
 
-
     def visualizar_coloracao(grafo, cores = None):
         '''
         Função para plot de uma visualização de coloração de um grafo pas
@@ -29,7 +28,7 @@ class Visual():
         if cores is not None:
             if isinstance(cores, dict) is False:
                 raise Exception('O dicionário de cores deve ser passado considerando que a chave é o inteiro associado a cor no grafo e os valores são cores em RGB hex.')
-            if len(cores.keys()) != list(set(grafo.vs["cor"])):
+            if len(cores.keys()) != len(list(set(grafo.vs["cor"]))):
                 raise Exception('A quantidade de chaves no dicionário de cores deve ser igual a quantidade de cores distintas usadas na coloração.')
             if set(cores.keys()) != set(grafo.vs["cor"]):
                 raise Exception('As cores passadas no dicionário de cores não é igual às cores usadas na coloração.')
