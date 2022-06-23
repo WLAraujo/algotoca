@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "graphcol"
+name = "graphcoltests"
 version = "0.1.0"
 description = ""
 authors = ["WLAraujo <lima.wesleyaraujo@gmail.com>"]

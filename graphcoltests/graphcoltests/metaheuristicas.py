@@ -2,7 +2,7 @@ import igraph
 import random
 import numpy as np
 import math
-from algotoca.grafos.coloracao.gulosos import Gulosos
+from graphcol. import Gulosos
 
 class Metaheuristicas:
     """
