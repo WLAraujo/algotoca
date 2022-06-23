@@ -1,13 +1,10 @@
 import igraph
 import random
 
-
 class Gulosos:
     '''
     Classe que contém os algoritmos gulosos para coloração de grafos
      implementados através de funções da classe.
-     Além disso funções auxiliares a esses algoritmos também são
-     implementadas aqui.
      Os algoritmos implementados nessa classe são o Guloso, DSatur e RLF.
     '''
 
@@ -47,7 +44,7 @@ class Gulosos:
         for vertice in lista_vertices:
             vertice_colorido = False
             for cor in cores:
-                if self.conjunto_independente(lista_arestas, (cor.union({vertice}))):
+                if FuncAux.conjunto_independente(lista_arestas, (cor.union({vertice}))):
                     cor.add(vertice)
                     grafo.vs[vertice]['cor'] = cores.index(cor)
                     vertice_colorido = True
@@ -75,6 +72,9 @@ class Gulosos:
         '''
         if isinstance(grafo, igraph.Graph) is False:
             raise Exception("O grafo passado como parâmetro deve pertencer à classe igraph.Graph")
+        if v_inicial is not None:
+            if isinstance(v_inicial, int) is False:
+                raise Exception("O grafo passado como parâmetro deve pertencer à classe igraph.Graph")
         numero_vertices = grafo.vcount()
         lista_arestas = grafo.get_edgelist()
         lista_adjacencias = grafo.get_adjlist()
@@ -84,13 +84,13 @@ class Gulosos:
         if v_inicial is not None:
             cor = {v_inicial}
             cores.append(cor)
-            grafo.vs[vertice_maior_grau]['cor'] = cores.index(cor)
+            grafo.vs[v_inicial]['cor'] = cores.index(cor)
             vertices_coloridos[v_inicial] = 1
         while all(vertice == 1 for vertice in vertices_coloridos) is False:
-            grau_saturacao = self.atualiza_grau_sat(lista_adjacencias, vertices_coloridos)
-            vertice_maior_grau = self.seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos)
+            grau_saturacao = FuncAux.atualiza_grau_sat(lista_adjacencias, vertices_coloridos)
+            vertice_maior_grau = FuncAux.seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos)
             for cor in cores:
-                if self.conjunto_independente(lista_arestas, cor.union({vertice_maior_grau})):
+                if FuncAux.conjunto_independente(lista_arestas, cor.union({vertice_maior_grau})):
                     cor.add(vertice_maior_grau)
                     grafo.vs[vertice_maior_grau]['cor'] = cores.index(cor)
                     vertices_coloridos[vertice_maior_grau] = 1
@@ -132,7 +132,11 @@ class Gulosos:
                 vertices_n_coloridos_aux = [v for v in vertices_n_coloridos_aux if v not in vizinhos_vertice_colorido]
         return grafo
 
-    def conjunto_independente(self, lista_arestas, subconjunto_vertices):
+class FuncAux:
+    '''
+    Classe que contém funções auxiliares usadas pelos algoritmos gulosos.
+    '''
+    def conjunto_independente(lista_arestas, subconjunto_vertices):
         '''
         Função que pega a lista de arestas de um grafo e um subconjunto de seus vértices e
          verifica se esse subconjunto é conjunto independente de vértices.
@@ -154,7 +158,7 @@ class Gulosos:
                     return False
         return True
 
-    def atualiza_grau_sat(self, lista_adjacencias, vertices_coloridos):
+    def atualiza_grau_sat(lista_adjacencias, vertices_coloridos):
         ''' 
         Função que devolve uma lista de grau de saturação, usada durante a execução do algoritmo DSatur.
 
@@ -172,7 +176,7 @@ class Gulosos:
                     grau_saturacao[vertice] += 1
         return grau_saturacao
 
-    def seleciona_vertice_dsatur(self, grau_saturacao, vertices_coloridos):
+    def seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos):
         ''' 
         Função que recebe uma lista com o grau de saturação de todos os
          vértices de um grafo e devolve o vértice com maior grau de saturação.
