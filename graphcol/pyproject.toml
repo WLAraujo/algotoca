@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "algotoca"
-version = "0.1.4.6"
+name = "graphcol"
+version = "0.1.0"
 description = ""
 authors = ["WLAraujo <lima.wesleyaraujo@gmail.com>"]
 

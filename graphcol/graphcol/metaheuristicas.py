@@ -1,6 +1,7 @@
 import igraph
 import random
 import numpy as np
+import math
 from algotoca.grafos.coloracao.gulosos import Gulosos
 
 class Metaheuristicas:
@@ -35,7 +36,7 @@ class Metaheuristicas:
         if isinstance(grafo, igraph.Graph) is False:
             raise Exception("O grafo passado como parâmetro deve pertencer à classe igraph.Graph.")
 
-        if cores_max == None:
+        if cores_max is None:
             cores_max = grafo.vcount()
         else:
             if isinstance(cores_max, int) is False:
@@ -52,7 +53,7 @@ class Metaheuristicas:
                 grafo.vs[vertice]["cor"] = cor_aleatoria
             return grafo
         
-        if solucao_inicial == None:
+        if solucao_inicial is None:
             grafo = criar_solucao_inicial(grafo)
         else:
             if isinstance(solucao_inicial, list) is False:
@@ -144,32 +145,105 @@ class Metaheuristicas:
 
         return melhor_grafo
 
-    def hill_climbing(grafo):
+    def hill_climbing(grafo, divisao = 0.75, iteracoes_max=50):
         """
-        Função usada para devolver uma coloração do grafo passado como parâmetro
-        usando o algoritmo Hill Climbing.
+        Função usada para devolver uma coloração do grafo passado como parâmetro usando o algoritmo 
+        Hill Climbing, algoritmos que trabalha sobre o espaço de soluções viáveis.
+        Esse algoritmo divide as cores de uma solução inicial em dois grupos e tenta encontrar 
+        vértices de um desses dois grupos que possa ser colorido com alguma das cores
+        do primeiro grupo sem perder a viabilidade da solução. O algoritmo também tira proveito do algoritmo
+        guloso para aumentar a região de exploração sem aumentar a quantidade de cores usadas a cada iteração.
 
         Parameters:
         grafo (igraph.Graph): Objeto grafo do pacote igraph
-    
+        divisao_inicial (float): Número entre 0 e 1 que indica qual a divisão de cores inicial que 
+        será realizada. Exemplo, 0.75 indica que o algoritmo tentará tranferir os vértices de 1/4 das cores
+        existentes.
+        max_iteracoes (int): Critério de parada que define número máximo de iterações que o algoritmo realiza
+
         Returns:
         igraph.Graph: Retorna o mesmo grafo, porém, com adição da label "cor",
         para acessá-la use grafo.vs["cor"]
         """
-        grafo_sol_inicial = Gulosos().dsatur(grafo)
 
-        qtd_cores = len(set(grafo_sol_inicial))
+        def cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices):
+            """
+            Função que cria a tabela de viabilidade que indica se um determinado vértice tem ou 
+            não vizinhos em uma cor. Devolve a tabela de viabilidade calculada onde as linhas representam
+            os vértices e as colunas representam as cores. Se um vértice possui vizinhos em uma cor então 
+            o valor na posição referente a essa combinação é 1, caso não é 0.
+            """
+            tabela_viabilidade = np.zeros((grafo.vcount(), qtd_cores))
+            lista_arestas = grafo.get_edgelist()
+            for vertice_1 in range(qtd_vertices):
+                for vertice_2 in range(qtd_vertices):
+                    if tabela_viabilidade[vertice_1][grafo.vs[vertice_2]["cor"]] == 0:
+                        if (vertice_1,vertice_2) in lista_arestas or (vertice_2,vertice_1) in lista_arestas:
+                            tabela_viabilidade[vertice_1][grafo.vs[vertice_2]["cor"]] = 1
+            return tabela_viabilidade
 
-        tabela_viabilidade = np.zeros((grafo.vcount(), qtd_cores))
-        lista_auxiliar = np.zeros((grafo.vcount(), qtd_cores))
-        lista_arestas = grafo.get_edgelist()
-        for v_1, v_2 in lista_arestas:
-            lista_auxiliar[v_1][grafo.vs[v_2]["cor"]] += 1
-            lista_auxiliar[v_2][grafo.vs[v_1]["cor"]] += 1
-        lista_auxiliar[lista_auxiliar < 0] = -1
-        lista_auxiliar[lista_auxiliar == 0] = 1 
+        def divide_cores(qtd_cores, divisao):
+            """
+            Função que divide aleatoriamente as cores usadas durante a iteração do grafo em dois
+            grupos visando identificar possíveis cores sendo usadas sem utilidade. Retorna os 
+            dois grupos de cores em duas listas.
+            """
+            cores_rand = random.sample(list(range(qtd_cores)), qtd_cores)
+            grupo_cores_original = cores_rand[:math.floor(qtd_cores*divisao)]
+            grupo_cores_transferir = cores_rand[math.floor(qtd_cores*divisao):]
+            return grupo_cores_original, grupo_cores_transferir
+
+        def transferencias(grafo, tabela_viabilidade):
+            """
+            Função que avalia se existem transferências de vértices coloridos com cores do grupo 2
+            que possam ser coloridos com cores do grupo 1 sem fazer a solução se tornar inviável.
+            Além de avaliar essa função também realiza essas transferências.
+            """
+            for vertice in range(qtd_vertices):
+                if grafo.vs[vertice]["cor"] in grupo_cores_2:
+                    for cor in grupo_cores_1:
+                        if tabela_viabilidade[vertice][cor] == 0:
+                            grafo.vs[vertice]["cor"] = cor
+                            vizinhanca = grafo.neighbors(vertice)
+                            for vizinho in vizinhanca:
+                                tabela_viabilidade[vizinho][cor] = 1
+            return grafo, tabela_viabilidade
         
+        def ordem_prox_iteracao(grafo, qtd_vertices):
+            """
+            Função que recebe o grafo da iteração atual e devolve uma lista com uma ordem dos vértices para
+            ser usada na construção da solução inicial da próxima iteração. Essa construção é necessária
+            pois o algoritmo aqui implementado usa o algoritmo guloso como heurística auxiliar de exploração.
+            A construção dessa ordem é feita com base num teorema que garante que se a ordem passada considera
+            cada cor um turno, não há como a solução devolvida ter mais cores do que a inicialmente considerada
+            na hora da construção da ordem. 
+            """
+            cores = grafo.vs["cor"]
+            vertices = list(range(qtd_vertices))
+            vertices_coloridos = zip(cores, vertices)
+            vertices_coloridos_ordenados = sorted(vertices_coloridos)
+            ordem = [vertice for _, vertice in vertices_coloridos_ordenados]
+            return ordem
+
+        iteracao = 0
+        ordem_guloso = None
+        while(iteracao <= iteracoes_max):
+            grafo_sol_inicial = Gulosos().guloso(grafo, ordem_guloso)
+            qtd_cores = len(set(grafo_sol_inicial.vs["cor"]))
+            qtd_vertices = grafo.vcount()
+            tabela_viabilidade = cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices)
+            grupo_cores_1, grupo_cores_2 = divide_cores(qtd_cores, divisao)
+            grafo, tabela_viabilidade = transferencias(grafo, tabela_viabilidade)
+            ordem_guloso = ordem_prox_iteracao(grafo, qtd_vertices)
+            iteracao = iteracao + 1
+
+        return grafo
+
+    def genetico():
+        pass
         
+    def colonia_formigas():
+        pass
         
 
 
