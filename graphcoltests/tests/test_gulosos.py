@@ -3,7 +3,7 @@ import sys
 import os
 import pytest
 from grafos_aleatorios import gerar_grafo, coloracao_viavel
-sys.path.insert(0,f'{os.getenv("HOME")}/graph-col/graphcoltests/graphcoltests')
+sys.path.insert(0,f'{os.getenv("HOME")}/graphcol/graphcoltests/graphcoltests')
 from gulosos import Gulosos
 
 @pytest.mark.parametrize(
