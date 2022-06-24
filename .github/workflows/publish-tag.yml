@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.8"]
     steps:
       - uses: actions/checkout@v2
       - name: Instalar versão do Python
@@ -26,5 +26,5 @@ jobs:
         run: mv graphcoltests graphcol; mv ./graphcol/graphcoltests ./graphcol/graphcol  
       - name: Realizar check e publicação
         working-directory: ./graphcol
-        run: python3 -m poetry check && python3 -m poetry build && python3 -m poetry publish -u ${{ secrets.USER_PYPI }} -p ${{ secrets.SECRET_PYPI}} 
+        run: poetry check && poetry build && poetry publish -u ${{ secrets.USER_PYPI }} -p ${{ secrets.SECRET_PYPI}} 
     
