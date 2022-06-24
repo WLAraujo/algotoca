@@ -18,10 +18,10 @@ jobs:
       - name: Mostrar versão do Python
         run: python -c "import sys; print(sys.version)"
       - name: Instalar dependências
-        working-directory: ./test/
+        working-directory: ./graphcoltests
         run: python -m pip install .
       - name: Instalar pytest
         run: python -m pip install pytest
       - name: Executar testes
-        working-directory: ./graphcol/tests
+        working-directory: ./graphcoltests/tests
         run: python -m pip install .
