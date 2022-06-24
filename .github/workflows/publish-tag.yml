@@ -27,5 +27,5 @@ jobs:
         run: |
           - python3 -m poetry check 
           - python3 -m poetry build 
-          - python3 -m poetry publish -u ${{ USER_PYPI }} -p ${{ SECRET_PYPI}} 
+          - python3 -m poetry publish -u ${{ secrets.USER_PYPI }} -p ${{ secrets.SECRET_PYPI}} 
     
