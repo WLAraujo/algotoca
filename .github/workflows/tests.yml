@@ -20,7 +20,7 @@ jobs:
       - name: Mostrar local e pastas
         run: ls ${{ github.workspace }}
       - name: Instalar dependências
-        working-directory: ./graphcoltests
+        working-directory: ${{ github.workspace }}/graphcoltests
         run: python -m pip install .
       - name: Instalar pytest
         run: python -m pip install pytest
