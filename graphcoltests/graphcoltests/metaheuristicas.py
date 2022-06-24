@@ -245,7 +245,7 @@ class Metaheuristicas:
         contador_iteracoes_iguais = 0
         while iteracao <= iteracoes_max:
             cores_anterior = qtd_cores
-            grafo_sol_inicial = Gulosos().guloso(grafo, ordem_guloso)
+            grafo_sol_inicial = Gulosos.guloso(grafo, ordem_guloso)
             qtd_cores = len(set(grafo_sol_inicial.vs["cor"]))
             tabela_viabilidade = cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices)
             grupo_cores_1, grupo_cores_2 = divide_cores(qtd_cores, divisao)
