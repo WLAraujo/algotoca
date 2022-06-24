@@ -3,6 +3,9 @@ name: Testes Pacote
 on: 
   push: 
     branches: develop
+    
+env:
+  HOME: /home/runner/work/graphcol/
 
 jobs:
   teste:
