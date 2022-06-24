@@ -2,14 +2,14 @@ import igraph
 import random
 import numpy as np
 import math
-from graphcol.gulosos import Gulosos
+from graphcoltests.gulosos import Gulosos
 
 class Metaheuristicas:
     """
     Classe com funções que executam algoritmos de coloração que usam metaheurísticas.
     """
 
-    def tabucol(grafo, solucao_inicial=None, tabu=5, iteracoes_min=20, iteracoes_max=50, cores_max = None):
+    def tabucol(grafo, solucao_inicial=None, tabu=5, iteracoes_min=20, iteracoes_max=50, cores_max = None, iteracoes_s_mudanca = 10):
         """
         Função usada para devolver uma coloração do grafo passado como parâmetro
         usando o algoritmo Coloração Tabu. A função realiza uma exploração do espaço de soluções
@@ -27,6 +27,8 @@ class Metaheuristicas:
         iteracoes_max (int): Número mínimo de iterações que o algoritmo pode realizar antes da solução ser devolvida.
         cores_max (int): Número de cores máximo que deve ser considerado durante a construção da solução. Caso não seja
                          passado um valor, será usada a quantidade de vértices do grafo.
+        limite_melhora (int): Caso o algoritmo faça essa quantidade de iterações em sequência e não haja uma mudança
+                              na quantidade de cores da solução calculada o algoritmo para a execução.
     
         Returns:
         igraph.Graph: Retorna o mesmo grafo, porém, com adição da label "cor",
@@ -126,26 +128,37 @@ class Metaheuristicas:
 
         iteracoes = 1
         melhor_coloracao = grafo.vcount()
+        cores_atual = melhor_coloracao
         melhor_grafo = grafo
+        cores_anterior = -1
+        contador_iteracoes_iguais = 0
         if isinstance(iteracoes_min, int) is False:
             raise("O número de iterações mínimo deve ser um inteiro.")
-        while(len(lista_colisoes) > 0 or iteracoes < iteracoes_min):
+        while(len(lista_colisoes) > 0) or (iteracoes < iteracoes_min):
             if iteracoes > iteracoes_max:
                 break
+            if cores_anterior == cores_atual:
+                contador_iteracoes_iguais = contador_iteracoes_iguais + 1
+                if contador_iteracoes_iguais == iteracoes_s_mudanca:
+                    break
+            else: 
+                contador_iteracoes_iguais = 0
             grafo, lista_tabu = movimento(grafo, lista_cores, lista_tabu, lista_auxiliar, lista_colisoes, tabu, iteracoes)
             iteracoes += 1
             lista_colisoes = cria_lista_colisoes(grafo)
             lista_auxiliar = cria_lista_auxiliar(grafo)
-            if len(set(grafo.vs["cor"])) < melhor_coloracao and len(lista_colisoes) == 0:
-                melhor_coloracao = len(set(grafo.vs["cor"]))
+            cores_anterior = cores_atual
+            cores_atual = len(set(grafo.vs["cor"]))
+            if cores_atual < melhor_coloracao and len(lista_colisoes) == 0:
+                melhor_coloracao = cores_atual
                 melhor_grafo = grafo
 
-        if len(lista_colisoes) > 0:
+        if len(cria_lista_colisoes(melhor_grafo)) > 0:
             print("Não foi possível encontrar solução viável com os parâmetros passados.")      
 
         return melhor_grafo
 
-    def hill_climbing(grafo, divisao = 0.75, iteracoes_max=50):
+    def hill_climbing(grafo, divisao = 0.75, iteracoes_max=50, iteracoes_s_melhora = 10):
         """
         Função usada para devolver uma coloração do grafo passado como parâmetro usando o algoritmo 
         Hill Climbing, algoritmos que trabalha sobre o espaço de soluções viáveis.
@@ -227,19 +240,29 @@ class Metaheuristicas:
 
         iteracao = 0
         ordem_guloso = None
-        while(iteracao <= iteracoes_max):
+        qtd_vertices = grafo.vcount()
+        qtd_cores = 0
+        contador_iteracoes_iguais = 0
+        while iteracao <= iteracoes_max:
+            cores_anterior = qtd_cores
             grafo_sol_inicial = Gulosos().guloso(grafo, ordem_guloso)
             qtd_cores = len(set(grafo_sol_inicial.vs["cor"]))
-            qtd_vertices = grafo.vcount()
             tabela_viabilidade = cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices)
             grupo_cores_1, grupo_cores_2 = divide_cores(qtd_cores, divisao)
             grafo, tabela_viabilidade = transferencias(grafo, tabela_viabilidade)
             ordem_guloso = ordem_prox_iteracao(grafo, qtd_vertices)
+            if cores_anterior == qtd_cores:
+                contador_iteracoes_iguais = contador_iteracoes_iguais + 1
+                if contador_iteracoes_iguais == iteracoes_s_melhora:
+                    print(f"Algoritmo não apresenta melhora de resultado há {iteracoes_s_melhora} iterações")
+                    break
+            else: 
+                contador_iteracoes_iguais = 0
             iteracao = iteracao + 1
 
         return grafo
 
-    def genetico():
+    def evolucionario():
         pass
         
     def colonia_formigas():
