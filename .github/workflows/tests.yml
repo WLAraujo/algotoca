@@ -17,6 +17,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Mostrar versão do Python
         run: python -c "import sys; print(sys.version)"
+      - name: Ver diretório
+        run: pwd
       - name: Instalar dependências
         working-directory: /graphcol/
         run: python -m pip install .
