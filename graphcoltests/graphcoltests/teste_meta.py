@@ -1,6 +1,7 @@
-from graph-col.graph-col.metaheuristicas import Metaheuristicas
+from metaheuristicas import Metaheuristicas
 import igraph
 import numpy as np
+import random
 
 def coloracao_viavel(grafo_colorido):
     lista_adj = grafo_colorido.get_adjlist()
@@ -8,13 +9,14 @@ def coloracao_viavel(grafo_colorido):
         for vizinho in lista_adj[vertice]:
             assert grafo_colorido.vs[vertice]["cor"] != grafo_colorido.vs[vizinho]["cor"]
 
-grafo = igraph.Graph(6)
-grafo.add_edges([(0,1),(0,2),(0,3),(0,4),(0,5),(1,5),(2,3)])
+def gerar_grafo():
+    grafo = igraph.Graph()
+    n = random.randint(20,100)
+    return grafo.Barabasi(n)
 
-col_tabu = Metaheuristicas.hill_climbing(grafo)
-
-print(coloracao_viavel(col_tabu))
-print(col_tabu.vs["cor"])
-
-print(grafo.get_adjlist())
+for i in range(200):
+    grafo = gerar_grafo()
+    col_tabu = Metaheuristicas.tabucol(grafo, cores_max=3)
+    #print(coloracao_viavel(col_tabu))
+    #print(col_tabu.vs["cor"])
 
