@@ -4,7 +4,7 @@ import random
 
 def gerar_grafo():
     grafo = igraph.Graph()
-    n = random.randint(5,25)
+    n = random.randint(15,30)
     return grafo.Barabasi(n)
 
 def coloracao_viavel(grafo_colorido):

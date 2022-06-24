@@ -3,7 +3,7 @@ import sys
 import os
 import pytest
 from grafos_aleatorios import gerar_grafo, coloracao_viavel
-sys.path.insert(0,f'{os.getenv("HOME")}/algotoca/algotoca/algotoca/grafos/coloracao')
+sys.path.insert(0,f'{os.getenv("HOME")}/graphcol/graphcoltests/graphcoltests')
 from gulosos import Gulosos
 
 @pytest.mark.parametrize(
@@ -21,7 +21,7 @@ def test_guloso_teo(vertices, arestas, cores):
     guloso com base em teoremas da literatura. A quantidade de cores 
     é exata.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     G = igraph.Graph()
     G.add_vertices(vertices)
     G.add_edges(arestas)
@@ -44,7 +44,7 @@ def test_dsatur_teo(vertices, arestas, cores):
     dsatur com base em teoremas da literatura. A quantidade de cores 
     é exata.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     G = igraph.Graph()
     G.add_vertices(vertices)
     G.add_edges(arestas)
@@ -66,7 +66,7 @@ def test_rlf_teo(vertices, arestas, cores):
     rlf com base em teoremas da literatura. A quantidade de cores 
     é exata.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     G = igraph.Graph()
     G.add_vertices(vertices)
     G.add_edges(arestas)
@@ -86,7 +86,7 @@ def test_guloso_rand(grafo_gerado):
     dos vizinhos de cada vértice é diferentes, ou seja, verifica se
     a coloração devolvida é viável.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     coloracao_guloso = algoritmos_gulosos.guloso(grafo_gerado)
     coloracao_viavel(coloracao_guloso)
 
@@ -103,7 +103,7 @@ def test_dsatur_rand(grafo_gerado):
     dos vizinhos de cada vértice é diferentes, ou seja, verifica se
     a coloração devolvida é viável.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     coloracao_guloso = algoritmos_gulosos.dsatur(grafo_gerado)
     coloracao_viavel(coloracao_guloso)
 
@@ -120,7 +120,7 @@ def test_rlf_rand(grafo_gerado):
     dos vizinhos de cada vértice é diferentes, ou seja, verifica se
     a coloração devolvida é viável.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     coloracao_guloso = algoritmos_gulosos.rlf(grafo_gerado)
     coloracao_viavel(coloracao_guloso)
 
@@ -151,7 +151,7 @@ def test_guloso_ordem(vertices, arestas, cores, ordem):
     Como a ordem de coloração é conhecida previamente a quantidade de
     cores usadas também é.
     """
-    algoritmos_gulosos = Gulosos()
+    algoritmos_gulosos = Gulosos
     G = igraph.Graph()
     G.add_vertices(vertices)
     G.add_edges(arestas)

@@ -8,7 +8,7 @@ class Gulosos:
      Os algoritmos implementados nessa classe são o Guloso, DSatur e RLF.
     '''
 
-    def guloso(self, grafo, ordem=None):
+    def guloso(grafo, ordem=None):
         '''
         Função que implementa o algoritmo guloso de coloração de grafos.
          A função devolve uma coloração para um grafo passado como argumento.
@@ -55,7 +55,7 @@ class Gulosos:
                 grafo.vs[vertice]['cor'] = cores.index(cor)
         return grafo
 
-    def dsatur(self, grafo, v_inicial=None):
+    def dsatur(grafo, v_inicial=None):
         ''' 
         Função que implementa o algoritmo DSatur (Degree of Saturation)
          de coloração de grafos. 
@@ -102,7 +102,7 @@ class Gulosos:
                 vertices_coloridos[vertice_maior_grau] = 1
         return grafo
     
-    def rlf(self, grafo):
+    def rlf(grafo):
         ''' 
         Função que implementa o algoritmo Recursive Largest First de coloração de grafos. 
          A função devolve uma coloração para um grafo passado como argumento.
