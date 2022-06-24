@@ -1,0 +1,28 @@
+name: Testes Pacote
+
+on: 
+  push: 
+    branches: develop
+
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Instalar versão do Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Mostrar versão do Python
+        run: python -c "import sys; print(sys.version)"
+      - name: Instalar dependências
+        working-directory: ./graphcoltests
+        run: python -m pip install .
+      - name: Instalar pytest
+        run: python -m pip install pytest
+      - name: Executar testes
+        working-directory: ./graphcoltests/tests
+        run: pytest
