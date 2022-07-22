@@ -1,22 +1,30 @@
-# algotoca
+# graphcol
 
-A ALGOTOCA visa ser uma biblioteca de algoritmos implementados pelo Laboratório de Teoria da computação, Otimização, Combinatória e Algoritmos (TOCA) da Universidade Federal do ABC (UFABC).
+Projeto de Gradução no curso de Ciência da Computação (PGC) da UFABC. Visa ser um pacote Python com implementação de alguns algoritmos para o problema de coloração em grafos. O PGC é desenvolvido por Wesley Lima de Araujo e orientado pela Professora Doutora Carla Negri Lintzmayer. O projeto dá continuidade a um trabalho de Iniciação Científica (IC) já desenvolvido por aluno e orientadora sobre o mesmo tema, porém, o enfoque da IC era um estudo teórico.
 
-Atualmente, a biblioteca é o Trabalho de Conclusão de Curso de um aluno da gradução que é membro do laboratório. O TCC do aluno consiste em implementar algoritmos para coloração de grafos, tema já trabalhado pelo aluno em uma Iniciação Científica.
-
-A biblioteca é construída e publicada usando o poetry, uma ferramenta de isolamento de ambientes e deploy de pacotes no pip. A algotoca está disponível no pip através do comando `pip install algotoca`. A biblioteca ainda está em fase primária de desenvolvimento e tem expectativa de lançamento de sua versão 1.0 em 2023.
-
-Passos para instalação do poetry (https://python-poetry.org/docs/master/#installing-with-the-official-installer):
-1. curl -sSL https://install.python-poetry.org | python3 -
-2. export PATH="/$HOME/.local/bin:$PATH"
-3. poetry --version
-
-Para controle de qualidade de código combinamos a análise de projeto de algoritmos derivada da experiência da professora orientadora do TCC e o uso do flake8, uma ferramenta para qualidade de código em Python.
-
-Para realizar teste de funções que aplicam algoritmos de coloração usamos a ferramenta pytest. Os testes do projeto estão contidos em `algotoca/tests`.
+Para desenvolvimento do pacote está sendo usada a ferramenta Poetry que automatiza uma parte considerável dos processos de criar e atualizar um pacote disponível no PyPi. PAra usar o pacote instale-o usando pip `pip install graphcol`.
 
 Algoritmos já implementados no pacote:
-1. Algoritmos de coloração heurísticos gulosos:
+* Algoritmos de coloração heurísticos gulosos:
    1. Guloso
    2. DSatur
    3. RLF
+* Algoritmos de coloração metaheurísticos:
+   1. Coloração Tabu
+   2. Hill-Climbing
+
+Algoritmos ainda a serem implementados:
+* Algoritmos metaheurísticos
+  1. Evolucionário Híbrido
+  2. Colônia de Formigas
+* Algoritmos exatos
+  1. Brown
+  2. DSatur Exato 
+
+Controle semântico das versões: `x.y.z`, já avisando que não segue o versionamento semântico padrão. 
+* `x` -> Versão major, passará a contar 1 na primeira entrega final da biblioteca (todos os algoritmos listados implementados).
+* `y` -> Versão minor, alterada quando algum algoritmo/funcionalidade novo for implementado com sucesso
+* `z` -> Versão patch, atualizada na correção de falhas e/ou adição de testes
+
+Controle de versões:
+* `0.2.0` -> Mudança de nome da biblioteca (reset das versões) + Alterações no código de hill-climbing + Adição de testes do hill-climbing

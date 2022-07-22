@@ -247,10 +247,6 @@ class Metaheuristicas:
             cores_anterior = qtd_cores
             grafo_sol_inicial = Gulosos.guloso(grafo, ordem_guloso)
             qtd_cores = len(set(grafo_sol_inicial.vs["cor"]))
-            tabela_viabilidade = cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices)
-            grupo_cores_1, grupo_cores_2 = divide_cores(qtd_cores, divisao)
-            grafo, tabela_viabilidade = transferencias(grafo, tabela_viabilidade)
-            ordem_guloso = ordem_prox_iteracao(grafo, qtd_vertices)
             if cores_anterior == qtd_cores:
                 contador_iteracoes_iguais = contador_iteracoes_iguais + 1
                 if contador_iteracoes_iguais == iteracoes_s_melhora:
@@ -259,11 +255,31 @@ class Metaheuristicas:
             else: 
                 contador_iteracoes_iguais = 0
             iteracao = iteracao + 1
+            tabela_viabilidade = cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices)
+            grupo_cores_1, grupo_cores_2 = divide_cores(qtd_cores, divisao)
+            grafo, tabela_viabilidade = transferencias(grafo, tabela_viabilidade)
+            ordem_guloso = ordem_prox_iteracao(grafo, qtd_vertices)
 
         return grafo
 
-    def evolucionario():
+    def evolucionario(grafo, pop_n = 20, iteracoes_tuning = 20):
+        """
+        Função usada para devolver uma coloração do grafo passado como parâmetro usando o algoritmo 
+        Híbrido Evolucionário (HE), algoritmos que trabalha sobre o espaço de soluções inviáveis.
+        O algoritmo recebe em sua entrada um grafo e devolve a melhor solução viável encontrada durante a exploração.
+        Caso nenhuma solução viável seja encontrada é retornada uma mensagem de erro informando isso.
+
+        Parameters:
+        grafo (igraph.Graph): Objeto grafo do pacote igraph
+
+        Returns:
+        igraph.Graph: Retorna o mesmo grafo, porém, com adição da label "cor",
+        para acessá-la use grafo.vs["cor"]
+        """
+
         pass
+
+
         
     def colonia_formigas():
         pass

@@ -4,7 +4,7 @@ import os
 import pytest
 import random
 from grafos_aleatorios import gerar_grafo, coloracao_viavel
-sys.path.insert(0,f'{os.getenv("HOME")}/graphcol/graphcoltests/graphcoltests')
+sys.path.insert(0,f'{os.getenv("HOME")}/graph-col/graphcol/graphcol')
 from metaheuristicas import Metaheuristicas
 
 @pytest.mark.parametrize(
