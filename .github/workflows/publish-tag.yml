@@ -1,0 +1,30 @@
+name: Publicar pacote e criar tag
+
+on:
+  pull_request:
+    branches: main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Instalar versão do Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Instalar e configurar poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.1.13
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - name: Alterar nome dos diretórios (Remover test)
+        run: mv graphcoltests graphcol; mv ./graphcol/graphcoltests ./graphcol/graphcol  
+      - name: Realizar check e publicação
+        working-directory: ./graphcol
+        run: poetry check && poetry build && poetry publish -u ${{ secrets.USER_PYPI }} -p ${{ secrets.SECRET_PYPI}} 
+    

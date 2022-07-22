@@ -278,9 +278,7 @@ class Metaheuristicas:
         """
 
         pass
-
-
-        
+ 
     def colonia_formigas():
         pass
         
