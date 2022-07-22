@@ -262,7 +262,7 @@ class Metaheuristicas:
 
         return grafo
 
-    def evolucionario(grafo, pop_n = 20, iteracoes_tuning = 20):
+    def evolucionario(grafo, n_pop = 20, iteracoes_tuning = 20):
         """
         Função usada para devolver uma coloração do grafo passado como parâmetro usando o algoritmo 
         Híbrido Evolucionário (HE), algoritmos que trabalha sobre o espaço de soluções inviáveis.
@@ -271,13 +271,140 @@ class Metaheuristicas:
 
         Parameters:
         grafo (igraph.Graph): Objeto grafo do pacote igraph
+        n_pop (int): Quantidade de elementos que a população vai manter
+        iteracoes_tuning (int): Quantidade de iterações que serão realizados os processos de evolução
 
         Returns:
         igraph.Graph: Retorna o mesmo grafo, porém, com adição da label "cor",
         para acessá-la use grafo.vs["cor"]
         """
+        
+        def criar_pop_inicial(grafo, n_pop):
+          """
+          Função que gera a primeira geração de indivíduos da população usada durante o algoritmo.
+          Devolve uma lista com soluções
+          """
+          algoritmos_gulosos = Gulosos()
+          pop_solucoes = []
+          for i in range(n_pop):
+             solucao = algoritmos_gulosos.dsatur(grafo).vs["cor"]
+             pop_solucoes.append(solucao)
+          return pop_solucoes
 
-        pass
+        def operador_recombinacao(pop_solucoes, n_pop, vertices):
+          """
+          Função que realiza operação de recombinação de duas soluções mães, atualmente presentes na população,
+          e gera uma solução filha. Aqui estamos usando o operador conhecido como Greedy Partition Crossover.
+          """
+          solucao_filha = [-1] * vertices
+          contador_vertices_pintados = 0
+          indices_maes = random.sample(range(n_pop), 2)
+          indice_mae1 = indices_maes[0]
+          indice_mae2 = indices_maes[1]
+          solucao_mae1 = pop_solucoes[indice_mae1]
+          solucao_mae2 = pop_solucoes[indice_mae2]  
+          flag_mae = 0
+          while contador_vertices_pintados != vertices :
+            solucao_mae1_limpa = [vertice for vertice in solucao_mae1 if vertice != -1]
+            solucao_mae2_limpa = [vertice for vertice in solucao_mae2 if vertice != -1]
+            contagem_mae1 = Counter(solucao_mae1_limpa)
+            contagem_mae2 = Counter(solucao_mae2_limpa)
+            cor_maior_mae1 = max(contagem_mae1, key=contagem_mae1.get)
+            cor_maior_mae2 = max(contagem_mae2, key=contagem_mae2.get)
+            if (contagem_mae1[cor_maior_mae1] > contagem_mae2[cor_maior_mae2] and flag_mae == 0) or (flag_mae == 2):
+              flag_mae = 1
+              for vertice in range(vertices):
+                if (pop_solucoes[indice_mae1][vertice] == cor_maior_mae1) and (solucao_mae1[vertice] != -1):
+                  solucao_filha[vertice] = cor_maior_mae1
+                  solucao_mae1[vertice] = -1
+                  solucao_mae2[vertice] = -1
+                  contador_vertices_pintados = contador_vertices_pintados + 1
+            elif (contagem_mae1[cor_maior_mae1] < contagem_mae2[cor_maior_mae2] and flag_mae == 0) or (flag_mae == 1):
+              flag_mae = 2
+              for vertice in range(vertices):
+                if (pop_solucoes[indice_mae2][vertice] == cor_maior_mae2) and (solucao_mae2[vertice] != -1):
+                  solucao_filha[vertice] = cor_maior_mae2
+                  solucao_mae1[vertice] = -1
+                  solucao_mae2[vertice] = -1
+                  contador_vertices_pintados = contador_vertices_pintados + 1
+            else:
+              primeira_mae = random.randint(1,2)
+              flag_mae = primeira_mae
+              if primeira_mae == 1:
+                flag_mae = 1
+                for vertice in range(vertices):
+                  if (pop_solucoes[indice_mae1][vertice] == cor_maior_mae1) and (solucao_mae1[vertice] != -1): 
+                    solucao_filha[vertice] = cor_maior_mae1
+                    solucao_mae1[vertice] = -1
+                    solucao_mae2[vertice] = -1
+                    contador_vertices_pintados = contador_vertices_pintados + 1
+              if primeira_mae == 2:
+                flag_mae = 2
+                for vertice in range(vertices):
+                  if (pop_solucoes[indice_mae2][vertice] == cor_maior_mae2) and (solucao_mae2[vertice] != -1):
+                    solucao_filha[vertice] = cor_maior_mae2
+                    solucao_mae1[vertice] = -1
+                    solucao_mae2[vertice] = -1
+                    contador_vertices_pintados = contador_vertices_pintados + 1
+          return indice_mae1, indice_mae2, solucao_filha
+    
+        def melhorar_sol_inicial(grafo, sol_inicial_filha):
+          """
+          Função que usa o algoritmo tabucol para melhorar a solução filha gerada na iteração
+          """
+          tabucol = Metaheuristicas.tabucol
+          grafo_c_solucao = tabucol(grafo, sol_inicial_filha)
+          return grafo_c_solucao.vs["cor"]
+        
+        def colisoes(grafo, solucao):
+          """
+          Função simples para cálculo de colisoes
+          """
+          colisoes = 0
+          lista_arestas = grafo.get_edgelist()
+          for v_1, v_2 in lista_arestas:
+            if solucao[v_1]==solucao[v_2]:
+              colisoes = colisoes + 1
+          return colisoes 
+
+        def substitui_mae(populacao, indice_mae1, indice_mae2):
+          """
+          Função usada para determinar qual mãe será substituida na iteração
+          """
+          colisoes_mae1 = colisoes(populacao[indice_mae1])
+          colisoes_mae2 = colisoes(populacao[indice_mae2])
+          if colisoes_mae1 > colisoes_mae2:
+            return indice_mae1
+          elif colisoes_mae1 > colisoes_mae2:
+            return indice_mae2
+          else:
+            indices = [indice_mae1, indice_mae2]
+            return random.choice(indices)
+        
+        def sol_final(grafo, populacao):
+          """
+          Função que retorna a solução que vai ser devolvida pelo algoritmo após as iterações.
+          """
+          lista_colisoes = []
+          for solucao in populacao:
+            lista_colisoes.append(colisoes(grafo, solucao)) 
+          menos_colisoes = min(lista_colisoes)
+          solucoes_menos_colisoes = [solucao for indice, solucao in enumerate(menos_colisoes) if lista_colisoes[indice] == menos_colisoes]
+          return random.choice(solucoes_menos_colisoes)
+    
+        pop_solucoes = criar_pop_inicial(grafo, n_pop)
+
+        for iteracao in range(iteracoes_tuning):
+          indice_mae1, indice_mae2, sol_filha = operador_recombinacao(pop_solucoes)
+          sol_filha_melhorada = melhorar_sol_inicial(grafo, sol_filha)
+          mae_substituida = substitui_mae(pop_solucoes, indice_mae1, indice_mae2)
+          pop_solucoes[mae_substituida] = sol_filha_melhorada
+        
+        sol_final = sol_final(grafo, pop_solucoes)
+            
+        grafo.vs["cor"] = sol_final
+        
+        return grafo
  
     def colonia_formigas():
         pass
