@@ -5,7 +5,7 @@ import random
 def gerar_grafo():
     grafo = igraph.Graph()
     n = random.randint(15,30)
-    return grafo.Erdos_Renyi(n, p=0.8)
+    return grafo.Erdos_Renyi(n, p=0.7)
 
 def coloracao_viavel(grafo_colorido):
     lista_adj = grafo_colorido.get_adjlist()

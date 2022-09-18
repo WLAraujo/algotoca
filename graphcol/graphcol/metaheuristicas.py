@@ -294,7 +294,7 @@ class Metaheuristicas:
           """
           pop_solucoes = []
           for i in range(n_pop):
-            solucao = Gulosos().dsatur(grafo, None).vs["cor"]
+            solucao = Gulosos.dsatur(grafo, None).vs["cor"]
             pop_solucoes.append(solucao)
           return pop_solucoes
 

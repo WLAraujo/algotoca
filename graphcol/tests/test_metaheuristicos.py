@@ -47,3 +47,22 @@ def test_hill_climbing(grafo_gerado):
     algoritmos_metaheuristicos = Metaheuristicas
     coloracao_metaheuristicos = algoritmos_metaheuristicos.hill_climbing(grafo_gerado)
     coloracao_viavel(coloracao_metaheuristicos)
+
+@pytest.mark.parametrize(
+    "grafo_gerado",
+    [
+        gerar_grafo() for n_grafo in range(100)
+        
+    ]
+)
+def test_evolucionario(capfd, grafo_gerado):
+    """
+    Testes da função que implementa o algoritmo metaheurístico 
+    coloração tabu para 100 grafos aleatórios. O teste verifica duas possibilidades,
+    se a coloração devolvida é inviável através da mensagem de erro da função e, 
+    caso não seja inviável, verifica se é viável
+    """
+    algoritmos_metaheuristicos = Metaheuristicas
+    n_pop = random.choice(list(range(10,30)))
+    coloracao_metaheuristicos = algoritmos_metaheuristicos.evolucionario(grafo = grafo_gerado, n_pop = n_pop)
+    coloracao_viavel(coloracao_metaheuristicos)
