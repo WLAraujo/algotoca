@@ -3,7 +3,8 @@ import random
 import numpy as np
 import math
 import collections
-from graphcoltests.gulosos import Gulosos
+#from graphcol.gulosos import Gulosos
+from gulosos import Gulosos
 
 class Metaheuristicas:
     """
@@ -180,6 +181,9 @@ class Metaheuristicas:
         para acessá-la use grafo.vs["cor"]
         """
 
+        if isinstance(grafo, igraph.Graph) is False:
+            raise Exception("O grafo passado como parâmetro deve pertencer à classe igraph.Graph.")
+
         def cria_tabela_viabilidade(grafo, qtd_cores, qtd_vertices):
             """
             Função que cria a tabela de viabilidade que indica se um determinado vértice tem ou 
@@ -263,7 +267,7 @@ class Metaheuristicas:
 
         return grafo
 
-    def evolucionario(grafo, n_pop = 20, iteracoes_tuning = 20, iteracoes_s_melhora = 10):
+    def evolucionario(grafo, n_pop = 20, iteracoes_tuning = 20):
         """
         Função usada para devolver uma coloração do grafo passado como parâmetro usando o algoritmo 
         Híbrido Evolucionário (HE), algoritmos que trabalha sobre o espaço de soluções inviáveis.
@@ -279,6 +283,9 @@ class Metaheuristicas:
         igraph.Graph: Retorna o mesmo grafo, porém, com adição da label "cor",
         para acessá-la use grafo.vs["cor"]
         """
+
+        if isinstance(grafo, igraph.Graph) is False:
+            raise Exception("O grafo passado como parâmetro deve pertencer à classe igraph.Graph.")
         
         def criar_pop_inicial(grafo, n_pop):
           """
@@ -287,7 +294,7 @@ class Metaheuristicas:
           """
           pop_solucoes = []
           for i in range(n_pop):
-            solucao = Gulosos.dsatur(grafo, None).vs["cor"]
+            solucao = Gulosos().dsatur(grafo, None).vs["cor"]
             pop_solucoes.append(solucao)
           return pop_solucoes
 
@@ -298,72 +305,63 @@ class Metaheuristicas:
           """
           solucao_filha = [-1] * vertices
           contador_vertices_pintados = 0
+          contador_cores = 0
           indices_maes = random.sample(range(n_pop), 2)
           indice_mae1 = indices_maes[0]
           indice_mae2 = indices_maes[1]
           solucao_mae1 = pop_solucoes_operador[indice_mae1].copy()
-          solucao_mae2 = pop_solucoes_operador[indice_mae2].copy()  
+          solucao_mae2 = pop_solucoes_operador[indice_mae2].copy() 
+          solucao_mae1_limpa = solucao_mae1.copy()
+          solucao_mae2_limpa = solucao_mae2.copy()
           flag_mae = 0
-          while contador_vertices_pintados < vertices :
-            print(contador_vertices_pintados, vertices, flag_mae)    
-            if (contador_vertices_pintados == 0):
-                solucao_mae1_limpa = solucao_mae1
-                solucao_mae2_limpa = solucao_mae2
-            else:
-                solucao_mae1_limpa = [vertice for vertice in solucao_mae1_limpa if vertice != -1]
-                solucao_mae2_limpa = [vertice for vertice in solucao_mae2_limpa if vertice != -1]
-            contagem_mae1 = collections.Counter(solucao_mae1_limpa)
-            contagem_mae2 = collections.Counter(solucao_mae2_limpa)
+          while contador_vertices_pintados < vertices : 
+            contagem_mae1 = collections.Counter([vertice for vertice in solucao_mae1_limpa if vertice != -1])
+            contagem_mae2 = collections.Counter([vertice for vertice in solucao_mae2_limpa if vertice != -1])
             cor_maior_mae1 = max(contagem_mae1, key=contagem_mae1.get)
             cor_maior_mae2 = max(contagem_mae2, key=contagem_mae2.get)
-            print(contador_vertices_pintados, vertices, flag_mae, solucao_mae1_limpa, solucao_mae2_limpa) 
-            if (contagem_mae1[cor_maior_mae1] > contagem_mae2[cor_maior_mae2] and flag_mae == 0) or (flag_mae == 2):
+            if (flag_mae == 2) or (contagem_mae1[cor_maior_mae1] > contagem_mae2[cor_maior_mae2] and flag_mae == 0):
               flag_mae = 1
-              for vertice in range(len(solucao_mae1_limpa)):
-                print(pop_solucoes_operador)
-                if (pop_solucoes_operador[indice_mae1][vertice] == cor_maior_mae1) and (solucao_mae1[vertice] != -1):
-                  solucao_filha[vertice] = cor_maior_mae1
+              for vertice in range(vertices):
+                if (solucao_mae2[vertice] == cor_maior_mae2) and (solucao_mae1_limpa[vertice] != -1):
+                  solucao_filha[vertice] = contador_cores
                   solucao_mae1_limpa[vertice] = -1
                   solucao_mae2_limpa[vertice] = -1
                   contador_vertices_pintados = contador_vertices_pintados + 1
-            elif (contagem_mae1[cor_maior_mae1] < contagem_mae2[cor_maior_mae2] and flag_mae == 0) or (flag_mae == 1):
+            elif (flag_mae == 1) or (contagem_mae1[cor_maior_mae1] < contagem_mae2[cor_maior_mae2] and flag_mae == 0):
               flag_mae = 2
-              print("Aqui2")
-              for vertice in range(len(solucao_mae1_limpa)):
-                print("Aqui22")
-                if (pop_solucoes_operador[indice_mae2][vertice] == cor_maior_mae2) and (solucao_mae2[vertice] != -1):
-                  solucao_filha[vertice] = cor_maior_mae2
+              for vertice in range(vertices):
+                if (solucao_mae1[vertice] == cor_maior_mae1) and (solucao_mae2_limpa[vertice] != -1):
+                  solucao_filha[vertice] = contador_cores
                   solucao_mae1_limpa[vertice] = -1
                   solucao_mae2_limpa[vertice] = -1
                   contador_vertices_pintados = contador_vertices_pintados + 1
             else:
               primeira_mae = random.randint(1,2)
-              flag_mae = primeira_mae 
-              print(len(solucao_mae1_limpa))               
+              flag_mae = primeira_mae                
               if flag_mae == 1:
                 flag_mae = 2
-                for vertice in range(len(solucao_mae1_limpa)):
-                  if (pop_solucoes_operador[indice_mae1][vertice] == cor_maior_mae1) and (solucao_mae1_limpa[vertice] != -1): 
-                    solucao_filha[vertice] = cor_maior_mae1
+                for vertice in range(vertices):
+                  if (solucao_mae1[vertice] == cor_maior_mae1) and (solucao_mae2_limpa[vertice] != -1): 
+                    solucao_filha[vertice] = contador_cores
                     solucao_mae1_limpa[vertice] = -1
                     solucao_mae2_limpa[vertice] = -1
                     contador_vertices_pintados = contador_vertices_pintados + 1
               elif flag_mae == 2:
                 flag_mae = 1
-                for vertice in range(len(solucao_mae1_limpa)):
-                  if (pop_solucoes_operador[indice_mae2][vertice] == cor_maior_mae2) and (solucao_mae2_limpa[vertice] != -1):
-                    solucao_filha[vertice] = cor_maior_mae2
+                for vertice in range(vertices):
+                  if (solucao_mae2[vertice] == cor_maior_mae2) and (solucao_mae1_limpa[vertice] != -1):
+                    solucao_filha[vertice] = contador_cores
                     solucao_mae1_limpa[vertice] = -1
                     solucao_mae2_limpa[vertice] = -1
                     contador_vertices_pintados = contador_vertices_pintados + 1
-          print("Travou4")
+            contador_cores = contador_cores + 1
           return indice_mae1, indice_mae2, solucao_filha
     
         def melhorar_sol_inicial(grafo, sol_inicial_filha):
           """
           Função que usa o algoritmo tabucol para melhorar a solução filha gerada na iteração
           """
-          tabucol = Metaheuristicas.tabucol
+          tabucol = Metaheuristicas().tabucol
           try:
             grafo_c_solucao = tabucol(grafo, sol_inicial_filha, msg_print=False)
             return grafo_c_solucao.vs["cor"]
@@ -415,7 +413,6 @@ class Metaheuristicas:
         iteracoes = 0
 
         while(iteracoes < iteracoes_tuning):
-          print(iteracoes)
           iteracoes = iteracoes + 1
           indice_mae1, indice_mae2, sol_filha = operador_recombinacao(pop_solucoes, n_pop, grafo.vcount())
           sol_filha_melhorada = melhorar_sol_inicial(grafo, sol_filha)

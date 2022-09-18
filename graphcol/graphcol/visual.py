@@ -1,6 +1,7 @@
 from igraph import *
 import igraph
 import random
+import matplotlib.pyplot as plt
 
 class Visual:
     '''
@@ -51,8 +52,8 @@ class Visual:
 
         labels_final = [str(vertice)+":"+str(cor) for vertice,cor in zip(list(range(grafo.vcount())),grafo.vs["cor"])]
 
-        return plot(grafo,
-                    vertex_size=20,
-                    vertex_color=lista_cores,
-                    vertex_label=labels_final,
-                    edge_width=2)
+        fig, ax = plt.subplots()
+
+        layout = grafo.layout("kk")
+
+        return igraph.plot(grafo, layout=layout, target=ax, vertex_color=lista_cores, vertex_label=labels_final)
