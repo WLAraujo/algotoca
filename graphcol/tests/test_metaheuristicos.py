@@ -58,9 +58,8 @@ def test_hill_climbing(grafo_gerado):
 def test_evolucionario(capfd, grafo_gerado):
     """
     Testes da função que implementa o algoritmo metaheurístico 
-    coloração tabu para 100 grafos aleatórios. O teste verifica duas possibilidades,
-    se a coloração devolvida é inviável através da mensagem de erro da função e, 
-    caso não seja inviável, verifica se é viável
+    evolucionário para 100 grafos aleatórios. O teste verifica se a coloração 
+    devolvida é viável
     """
     algoritmos_metaheuristicos = Metaheuristicas
     n_pop = random.choice(list(range(10,30)))

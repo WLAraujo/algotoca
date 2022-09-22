@@ -3,8 +3,8 @@ import random
 import numpy as np
 import math
 import collections
-#from graphcol.gulosos import Gulosos
-from gulosos import Gulosos
+from graphcol.gulosos import Gulosos
+#from gulosos import Gulosos
 
 class Metaheuristicas:
     """
@@ -425,5 +425,46 @@ class Metaheuristicas:
         
         return grafo
  
-    def colonia_formigas():
-        pass
+    def colonia_formigas(grafo, n_formigas = 20, max_iteracoes = 20):
+
+        def rlf_colonia_formigas(grafo, n_vertices, cores_max):
+            """
+            Para construir as soluções de cada "formiga" o colônia de formigas usa uma adaptação do RLF
+            já implementado na classe de heurísticas, porém, com algumas adaptações. As adaptações são:
+            1 - Um número máximo de cores é permitido durante a construção da solução; 2 - A escolha do
+            primeiro vértice de cada cor nova é aleatória; 3 - Os vértices não coloridos até o esgotamento
+            do número máximo de cores permanecem não coloridos.
+            """
+            vertices_n_coloridos = list(range(n_vertices))
+            cores_usadas = 0
+            cores = []
+            while len(vertices_n_coloridos) != 0 and cores_usadas < cores_max:
+                cores.append(set())
+                vertices_n_coloridos_aux = vertices_n_coloridos.copy()
+                while len(vertices_n_coloridos_aux) != 0:
+                    vertice_escolhido = random.choice(vertices_n_coloridos_aux)
+                    cores[-1].add(vertice_escolhido)
+                    vertices_n_coloridos.remove(vertice_escolhido)
+                    grafo.vs[vertice_escolhido]['cor'] = cores.index(cores[-1])
+                    vertices_n_coloridos_aux.remove(vertice_escolhido)
+                    vizinhos_vertice_colorido = grafo.neighbors(vertice_escolhido)
+                    vertices_n_coloridos_aux = [v for v in vertices_n_coloridos_aux if v not in vizinhos_vertice_colorido]
+                cores_usadas = cores_usadas + 1
+            grafo.vs['cor'] = [(-1) if cor is None else cor for cor in grafo.vs['cor']]
+            return grafo
+        
+        n_vertices = grafo.vcount()
+        matriz_global = np.zeros((n_vertices, n_vertices))
+        cores_max = n_vertices
+
+        for iteracao in range(max_iteracoes):
+            matriz_local = np.zeros((n_vertices, n_vertices))
+            melhor_sol = n_vertices
+            eh_viavel = False
+            for formiga in range(n_formigas):
+                solucao = rlf_colonia_formigas(grafo, n_vertices = n_vertices, cores_max = n_vertices)
+                if (-1) in solucao.vs['cor']:
+                     solucao.vs['cor'] = []
+
+
+
