@@ -425,7 +425,74 @@ class Metaheuristicas:
         
         return grafo
  
-    def colonia_formigas(grafo, n_formigas = 20, max_iteracoes = 20):
+    def colonia_formigas(grafo, n_formigas = 20, max_iteracoes = 20, alfa = 1, beta = 1, evaporacao = 0.75):
+
+        def peso_trilha_global(vertice, cor):
+            """
+            Função responsável por calcular o peso da influência da trilha global
+            na decisão de adicionar ou não um vértice à coloração
+            """
+            sum_trilha_global = 0
+            for vertice_colorido in cor:
+                sum_trilha_global = sum_trilha_global + matriz_global[vertice][vertice_colorido]
+            influencia_trilha_global = sum_trilha_global / len(cor)
+            return influencia_trilha_global
+        
+        def peso_heuristica(grafo, vertice, n_coloridos):
+            """
+            Função que calcula o valor de uma heurística responsável por favorecer a adição
+            do vértice à cor. Aqui a heurística considerada é o grau do vértice escolhido no
+            grafo induzido pelos vértices ainda não coloridos
+            """
+            grafo_induzido = grafo.induced_subgraph(vertices=n_coloridos, implementation="create_from_scratch")
+            novo_vertice = n_coloridos.index(vertice)
+            grau_vertice = grafo_induzido.degree(novo_vertice)
+            return grau_vertice
+
+        def peso_individual_vertice(grafo, vertice, cor, n_coloridos):
+            """
+            Considerando as contribuições da trilha global e da heurística calculamos
+            um peso final multiplicando essas duas últimas
+            """
+            peso_trilha = peso_trilha_global(vertice, cor)
+            peso_grau = peso_heuristica(grafo, vertice, n_coloridos)
+            peso_vertice = peso_trilha * peso_grau
+            return peso_vertice
+
+        def peso_n_coloridos(grafo, cor, n_coloridos):
+            """
+            Temos que considerar a soma dos pesos de todos os vértices ainda não coloridos,
+            isso é, calcular e somar os pesos individuais de cada vértice ainda não colorido 
+            segundo nossa função de probabilidade
+            """
+            sum_pesos = sum(peso_individual_vertice(grafo, vertice, cor, n_coloridos) for vertice in n_coloridos)
+            return sum_pesos
+
+        def probabilidade_inclusao(grafo, cor, vertice, n_coloridos, alfa, beta):
+            """
+            Função responsável por juntar todas as funções peso definidas e devolver um
+            número entre 0 e 1 que indica a probabilidade do vértice ser adicionado ou não a cor
+            """
+            peso_vertice = (peso_trilha_global(vertice, cor)**alfa) * (peso_heuristica(grafo, vertice, n_coloridos)**beta)
+            peso_outros = peso_n_coloridos(grafo, cor, n_coloridos)
+            if peso_outros == 0:
+                return 1
+            return peso_vertice/peso_outros
+
+        def coloracao_vertices(grafo, vertice_escolhido, cores, vertices_n_coloridos, vertices_n_coloridos_aux):
+            """
+            Para cada vértice colorido é necessário que sejam seguidas algumas etapas
+            de atualização das estruturas de dados mantidas pelo algoritmo. Essa função faz
+            essas atualizações e devolve para o RLF personalizado que é usado aqui no
+            Colônia de Formigas
+            """
+            cores[-1].add(vertice_escolhido)
+            vertices_n_coloridos.remove(vertice_escolhido)
+            grafo.vs[vertice_escolhido]['cor'] = cores.index(cores[-1])
+            vertices_n_coloridos_aux.remove(vertice_escolhido)
+            vizinhos_vertice_colorido = grafo.neighbors(vertice_escolhido)
+            vertices_n_coloridos_aux = [v for v in vertices_n_coloridos_aux if v not in vizinhos_vertice_colorido]
+            return grafo, cores, vertices_n_coloridos, vertices_n_coloridos_aux
 
         def rlf_colonia_formigas(grafo, n_vertices, cores_max):
             """
@@ -437,34 +504,68 @@ class Metaheuristicas:
             """
             vertices_n_coloridos = list(range(n_vertices))
             cores_usadas = 0
+            grafo.vs['cor'] = [-1] * n_vertices
             cores = []
             while len(vertices_n_coloridos) != 0 and cores_usadas < cores_max:
                 cores.append(set())
                 vertices_n_coloridos_aux = vertices_n_coloridos.copy()
                 while len(vertices_n_coloridos_aux) != 0:
                     vertice_escolhido = random.choice(vertices_n_coloridos_aux)
-                    cores[-1].add(vertice_escolhido)
-                    vertices_n_coloridos.remove(vertice_escolhido)
-                    grafo.vs[vertice_escolhido]['cor'] = cores.index(cores[-1])
-                    vertices_n_coloridos_aux.remove(vertice_escolhido)
-                    vizinhos_vertice_colorido = grafo.neighbors(vertice_escolhido)
-                    vertices_n_coloridos_aux = [v for v in vertices_n_coloridos_aux if v not in vizinhos_vertice_colorido]
+                    if len(cores[-1]) == 0:
+                      grafo, cores, vertices_n_coloridos, vertices_n_coloridos_aux = coloracao_vertices(grafo, vertice_escolhido, cores, vertices_n_coloridos, vertices_n_coloridos_aux)
+                    else:
+                      probabilidade = probabilidade_inclusao(grafo, cores[-1], vertice_escolhido, vertices_n_coloridos_aux, alfa, beta)
+                      adicionado = np.random.binomial(1, probabilidade)
+                      if adicionado == 1:
+                        grafo, cores, vertices_n_coloridos, vertices_n_coloridos_aux = coloracao_vertices(grafo, vertice_escolhido, cores, vertices_n_coloridos, vertices_n_coloridos_aux)
+                      else:
+                        vertices_n_coloridos_aux.remove(vertice_escolhido)
                 cores_usadas = cores_usadas + 1
-            grafo.vs['cor'] = [(-1) if cor is None else cor for cor in grafo.vs['cor']]
             return grafo
         
+        def melhorar_sol_inicial(grafo, sol_inicial):
+            """
+            Caso a solução inicialmente construída com o RLF seja incompleta, os vértices
+            não coloridos são atribuidos aleatoriamente. Para melhorar essa situação usamos
+            o tabucol com a solução já construída.
+            """
+            tabucol = Metaheuristicas().tabucol
+            try:
+                grafo_c_solucao = tabucol(grafo, sol_inicial, msg_print=False)
+                return grafo_c_solucao.vs["cor"]
+            except:
+                return sol_inicial
+        
+        def solucao_valida(grafo):
+            """
+            Função que itera sobre o grafo e verifica se a coloração atruibuida a ele é válida ou não.
+            """
+            lista_adj = grafo.get_adjlist()
+            for vertice in range(grafo.vcount()):
+                for vizinho in lista_adj[vertice]:
+                    if grafo.vs[vertice]["cor"] == grafo.vs[vizinho]["cor"]:
+                        return False
+            return True
+
         n_vertices = grafo.vcount()
         matriz_global = np.zeros((n_vertices, n_vertices))
         cores_max = n_vertices
 
         for iteracao in range(max_iteracoes):
             matriz_local = np.zeros((n_vertices, n_vertices))
-            melhor_sol = n_vertices
+            min_cores = cores_max
             eh_viavel = False
             for formiga in range(n_formigas):
+                
                 solucao = rlf_colonia_formigas(grafo, n_vertices = n_vertices, cores_max = n_vertices)
                 if (-1) in solucao.vs['cor']:
-                     solucao.vs['cor'] = []
+                    solucao.vs['cor'] = [cor for cor in solucao.vs['cor'] if cor != (-1) else random.choice(range(max(solucao.vs['cor'])+1))]
+                    grafo = melhorar_sol_inicial(solucao, solucao.vs['cor'])
+                if solucao_valida(grafo) is True:
+                    eh_viavel = True
+                if 
+            if eh_viavel == True:
+                min_cores = min_cores - 1
 
 
 
