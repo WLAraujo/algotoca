@@ -546,26 +546,46 @@ class Metaheuristicas:
                     if grafo.vs[vertice]["cor"] == grafo.vs[vizinho]["cor"]:
                         return False
             return True
+        
+        def feromonio(grafo, n_vertices, matriz_local):
+            """
+            Função que aplica o conceito de fermônio na matriz local da iteração específica.
+            O feromônio tratado no algoritmo nada mais é que uma função que aumenta o valor da
+            matriz local quando dois vértices estão na mesma cor em uma determinada solução viável.
+            """
+            for vertice1 in range(n_vertices):
+                for vertice2 in range(n_vertices):
+                    if vertice1 != vertice2:
+                        if grafo.vs['cor'] == grafo.vs['cor']:
+                            matriz_local[vertice1][vertice2] = matriz_local[vertice1][vertice2] + 3
+                        else:
+                            matriz_local[vertice1][vertice2] = matriz_local[vertice1][vertice2] + 0.5
+            return matriz_local
 
         n_vertices = grafo.vcount()
         matriz_global = np.zeros((n_vertices, n_vertices))
         cores_max = n_vertices
+        melhor_solucao = igraph.Graph()
 
         for iteracao in range(max_iteracoes):
             matriz_local = np.zeros((n_vertices, n_vertices))
             min_cores = cores_max
-            eh_viavel = False
+            encontrou_viavel = False
             for formiga in range(n_formigas):
-                
                 solucao = rlf_colonia_formigas(grafo, n_vertices = n_vertices, cores_max = n_vertices)
                 if (-1) in solucao.vs['cor']:
                     solucao.vs['cor'] = [cor for cor in solucao.vs['cor'] if cor != (-1) else random.choice(range(max(solucao.vs['cor'])+1))]
                     grafo = melhorar_sol_inicial(solucao, solucao.vs['cor'])
                 if solucao_valida(grafo) is True:
-                    eh_viavel = True
-                if 
-            if eh_viavel == True:
+                    encontrou_viavel = True
+                    if len(set(solucao.vs['cor'])) < min_cores:
+                        melhor_solucao = grafo
+                matriz_local = matriz_local + feromonio(grafo, n_vertices, matriz_local)
+            matriz_global = (matriz_global * evaporacao) + matriz_local
+            if encontrou_viavel == True:
                 min_cores = min_cores - 1
+        
+        return melhor_solucao
 
 
 
