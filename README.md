@@ -12,14 +12,14 @@ Algoritmos já implementados no pacote:
 * Algoritmos de coloração metaheurísticos:
    1. Coloração Tabu
    2. Hill-Climbing
+   3. Evolucionário Híbrido
 
 Algoritmos ainda a serem implementados:
 * Algoritmos metaheurísticos
-  1. Evolucionário Híbrido
-  2. Colônia de Formigas
+  1. Colônia de Formigas
 * Algoritmos exatos
-  1. Brown
-  2. DSatur Exato 
+  1. Lawler
+  2. Brown 
 
 Controle semântico das versões: `x.y.z`, já avisando que não segue o versionamento semântico padrão. 
 * `x` -> Versão major, passará a contar 1 na primeira entrega final da biblioteca (todos os algoritmos listados implementados).
