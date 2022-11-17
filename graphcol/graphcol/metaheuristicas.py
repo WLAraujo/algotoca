@@ -3,8 +3,7 @@ import random
 import numpy as np
 import math
 import collections
-from graphcol.gulosos import Gulosos
-#from gulosos import Gulosos
+from gulosos import Gulosos
 
 class Metaheuristicas:
     """
@@ -574,7 +573,7 @@ class Metaheuristicas:
             for formiga in range(n_formigas):
                 solucao = rlf_colonia_formigas(grafo, n_vertices = n_vertices, cores_max = n_vertices)
                 if (-1) in solucao.vs['cor']:
-                    solucao.vs['cor'] = [cor for cor in solucao.vs['cor'] if cor != (-1) else random.choice(range(max(solucao.vs['cor'])+1))]
+                    solucao.vs['cor'] = [cor if cor != (-1) else random.choice(range(max(solucao.vs['cor'])+1)) for cor in solucao.vs['cor']]
                     grafo = melhorar_sol_inicial(solucao, solucao.vs['cor'])
                 if solucao_valida(grafo) is True:
                     encontrou_viavel = True
