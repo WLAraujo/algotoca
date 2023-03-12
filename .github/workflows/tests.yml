@@ -22,11 +22,11 @@ jobs:
       - name: Mostrar versão do Python
         run: python -c "import sys; print(sys.version)"
       - name: Instalar dependências
-        working-directory: /graphcol/testes
+        working-directory: ./testes/
         run: python -m pip install .
       - name: Instalar pytest
         run: python -m pip install pytest
       - name: Executar testes
-        working-directory: /graphcol/testes
+        working-directory: ./testes/
         run: pytest
 
