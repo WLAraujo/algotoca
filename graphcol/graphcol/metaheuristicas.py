@@ -3,7 +3,7 @@ import random
 import numpy as np
 import math
 import collections
-from gulosos import Gulosos
+from graphcol.gulosos import Gulosos
 
 class Metaheuristicas:
     """
@@ -426,6 +426,11 @@ class Metaheuristicas:
  
     def colonia_formigas(grafo, n_formigas = 20, max_iteracoes = 20, alfa = 1, beta = 1, evaporacao = 0.75):
 
+        """
+        Função usada para devolver uma coloração do grafo passado como parâmetro usando o algoritmo 
+        Colônia de Formigas, algoritmos que trabalha sobre o espaço de soluções viáveis.
+        """
+
         def peso_trilha_global(vertice, cor):
             """
             Função responsável por calcular o peso da influência da trilha global
@@ -455,7 +460,7 @@ class Metaheuristicas:
             """
             peso_trilha = peso_trilha_global(vertice, cor)
             peso_grau = peso_heuristica(grafo, vertice, n_coloridos)
-            peso_vertice = peso_trilha * peso_grau
+            peso_vertice = peso_trilha**alfa * peso_grau**beta
             return peso_vertice
 
         def peso_n_coloridos(grafo, cor, n_coloridos):

@@ -3,8 +3,7 @@ import sys
 import os
 import pytest
 from grafos_aleatorios import gerar_grafo, coloracao_viavel
-sys.path.insert(0,f'/home/wlaraujo/Github/graphcol/graphcol/graphcol')
-from gulosos import Gulosos
+from graphcol.gulosos import Gulosos
 
 @pytest.mark.parametrize(
     "vertices, arestas, cores",
