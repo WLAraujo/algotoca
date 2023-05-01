@@ -23,7 +23,7 @@ Controle semântico das versões: `x.y.z`, já avisando que não segue o version
 * `z` -> Versão patch, atualizada na correção de falhas e/ou adição de testes
 
 Controle de versões:
-* `0.3.2` -> Adição do algoritmo de Lawler, primeira implementação dos algoritmos exatos
+* `0.4.0` -> Implementação do DSatur exato, testes pré-lançamento oficial
 
 ## Publicação da biblioteca
 
@@ -64,3 +64,62 @@ Para adicionar ambiente virtual como kernel dos notebooks:
 2. Adicione o ambiente virtual aos kernels - `python3 -m ipykernel install --user --name=experimentos_graphcol`
 3. Installe os pacotes dependências - `pip install -f requirements.txt`
 4. Abra o JupyterLab - `jupyter lab`
+
+# Descrição de componentes
+
+Segue uma breve descrição de cada um dos arquivos componentes desse repositório.
+
+``` bash
+graphcol
+├── experimentos --> Pasta com experimento e análise experimental
+│   ├── analises.ipynb --> Notebook com análises realizadas
+│   ├── instancias --> Pasta com instâncias utilizadas nos experimentos
+│   │   ├── anna.col
+│   │   ├── david.col
+│   │   ├── games120.col
+│   │   ├── homer.col
+│   │   ├── huck.col
+│   │   ├── instancias.sh
+│   │   ├── jean.col
+│   │   ├── miles1000.col
+│   │   ├── miles250.col
+│   │   ├── miles500.col
+│   │   ├── miles750.col
+│   │   ├── myciel3.col
+│   │   ├── myciel4.col
+│   │   ├── myciel5.col
+│   │   ├── myciel6.col
+│   │   ├── queen5_5.col
+│   │   ├── queen6_6.col
+│   │   ├── queen7_7.col
+│   │   ├── queen8_12.col
+│   │   ├── queen8_8.col
+│   │   └── queen9_9.col
+│   ├── requirements.txt --> Dependências usadas na análise experimental
+│   ├── resultados --> Pasta com resultados do experimento
+│   │   ├── Dados experimento - Metaheurísticas.csv
+│   │   └── Dados experimentos - Gulosos.csv
+│   └── testes_gulosos_metaheuristicos.py --> Código do experimento
+├── graphcol --> Pasta base do pacote
+│   ├── dist --> Pasta com objetos do pacote
+│   ├── graphcol --> Pasta com implementações em código
+│   │   ├── exatos.py --> Implementações dos algoritmos exatos
+│   │   ├── gulosos.py --> Implementações dos heurísticas gulosas
+│   │   ├── __init__.py
+│   │   ├── metaheuristicas.py --> Implementações das metaheurísticas
+│   │   └── visual.py --> Implementação de componente para visualizar coloração
+│   ├── poetry.lock --> Lock de dependências usadas no desenvolvimento
+│   ├── pyproject.toml --> Arquivo de configuração do pacote
+│   └── README.rst --> Arquivo de documentação no PyPi
+├── LICENSE --> Arquivo com licença do projeto
+├── README.md --> Arquivo README do projeto com documentação básica
+└── testes --> Pasta com testes unitários do projeto
+    ├── grafos_aleatorios.py
+    ├── __pycache__
+    │   ├── grafos_aleatorios.cpython-39.pyc
+    │   ├── test_exatos.cpython-39-pytest-7.2.0.pyc
+    │   ├── test_gulosos.cpython-39-pytest-7.2.0.pyc
+    │   └── test_metaheuristicos.cpython-39-pytest-7.2.0.pyc
+    ├── test_exatos.py
+    ├── test_gulosos.py
+    └── test_metaheuristicos.py

@@ -2,9 +2,9 @@ import igraph
 import pytest
 import random
 
-def gerar_grafo():
+def gerar_grafo(min = 15, max = 50):
     grafo = igraph.Graph()
-    n = random.randint(15,30)
+    n = random.randint(min,max)
     return grafo.Erdos_Renyi(n, p=0.7)
 
 def coloracao_viavel(grafo_colorido):
