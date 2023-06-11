@@ -2,7 +2,7 @@ name: Publicar pacote e criar tag
 
 on:
   pull_request:
-    branches: main
+    branches: []
 
 jobs:
   publish:

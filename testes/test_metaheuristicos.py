@@ -4,8 +4,8 @@ import os
 import pytest
 import random
 from grafos_aleatorios import gerar_grafo, coloracao_viavel
-sys.path.insert(0,f'{os.getenv("HOME")}/graph-col/graphcol/graphcol')
-from metaheuristicas import Metaheuristicas
+from graphcol import gulosos
+from graphcol.metaheuristicas import Metaheuristicas
 
 @pytest.mark.parametrize(
     "grafo_gerado",
@@ -64,4 +64,21 @@ def test_evolucionario(capfd, grafo_gerado):
     algoritmos_metaheuristicos = Metaheuristicas
     n_pop = random.choice(list(range(10,30)))
     coloracao_metaheuristicos = algoritmos_metaheuristicos.evolucionario(grafo = grafo_gerado, n_pop = n_pop)
+    coloracao_viavel(coloracao_metaheuristicos)
+
+@pytest.mark.parametrize(
+    "grafo_gerado",
+    [
+        gerar_grafo() for n_grafo in range(100)
+        
+    ]
+)
+def test_colonia(capfd, grafo_gerado):
+    """
+    Testes da função que implementa o algoritmo metaheurístico 
+    colônia de formigas para 100 grafos aleatórios. O teste verifica se a coloração 
+    devolvida é viável
+    """
+    algoritmos_metaheuristicos = Metaheuristicas
+    coloracao_metaheuristicos = algoritmos_metaheuristicos.colonia_formigas(grafo = grafo_gerado)
     coloracao_viavel(coloracao_metaheuristicos)

@@ -2,7 +2,7 @@ name: Testes Pacote
 
 on: 
   push: 
-    branches: develop
+    branches: [develop, main]
     
 env:
   HOME: /home/runner/work/graphcol/
@@ -22,11 +22,11 @@ jobs:
       - name: Mostrar versão do Python
         run: python -c "import sys; print(sys.version)"
       - name: Instalar dependências
-        working-directory: ./graphcoltests
+        working-directory: ./graphcol/
         run: python -m pip install .
       - name: Instalar pytest
         run: python -m pip install pytest
       - name: Executar testes
-        working-directory: ./graphcoltests/tests
+        working-directory: ./testes/
         run: pytest
 
