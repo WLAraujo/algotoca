@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "graphcol"
-version = "0.4.0"
+version = "0.4.2"
 description = ""
 authors = ["WLAraujo <lima.wesleyaraujo@gmail.com>"]
 

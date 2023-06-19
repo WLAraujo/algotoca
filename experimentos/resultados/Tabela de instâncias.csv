@@ -1,0 +1,21 @@
+Instância,Vértices,Arestas,Sol Ótima
+anna,138,493,11
+david,87,406,11
+games120,120,638,9
+huck,74,301,11
+jean,80,254,10
+miles250,128,387,8
+myciel2,5,5,3
+myciel3,11,20,4
+myciel4,23,71,5
+myciel5,47,236,6
+myciel6,95,755,7
+queen5_5,25,160,5
+queen6_6,36,290,7
+queen7_7,49,476,7
+queen8_12,96,1368,12
+queen8_8,64,728,9
+queen9_9,81,1056,10
+miles500,128,1170,20
+miles750,128,2113,31
+miles1000,128,3216,42
