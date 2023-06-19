@@ -10,6 +10,10 @@ class Exatos:
 
   """
   Classe que contém a implementação dos algoritmos exatos para coloração de grafos,
+  até o momento foram implementados os algoritmos de Lawler que devolve o número 
+  cromático do grafo passado de entrada e o algoritmo Dsatur Exato que usa a heurística
+  de grau de saturação em conjunto com backtracking e branch-and-bound para buscar na 
+  árvore de soluções a solução exata do problema de coloração.
   """
     
   def cromatico_lawler(grafo):
@@ -46,90 +50,90 @@ class Exatos:
           
     return X[lista_subgrafos[(2**n_vertices)-1]]
 
-def dsatur_exato(grafo):
-  """
-  Função usada como interface do algoritmo dsatur exato, usada na
-  primeira que começa a recursão que implementa o backtracking. A coisa
-  mais importante que essa função faz é criar um primeira solução do dsatur 
-  """
-  numero_vertices = grafo.vcount()
-  lista_adjacencias = grafo.get_adjlist()
-  lista_arestas = grafo.get_edgelist()
-  primeira_coloracao = Gulosos.dsatur(grafo).vs["cor"]
-  melhor_resultado = len(set(primeira_coloracao))
-
-  def dsatur_recursao(grafo, melhor_geral, coloracao = [], vertices_coloridos = []):
+  def dsatur_exato(grafo):
     """
-    Função usada nas chamadas recursivas do Dsatur exato, funcionando como o
-    backtracking do algoritmo
+    Função usada como interface do algoritmo dsatur exato, usada na
+    primeira que começa a recursão que implementa o backtracking. A coisa
+    mais importante que essa função faz é criar um primeira solução do dsatur 
     """
+    numero_vertices = grafo.vcount()
+    lista_adjacencias = grafo.get_adjlist()
+    lista_arestas = grafo.get_edgelist()
+    primeira_coloracao = Gulosos.dsatur(grafo).vs["cor"]
+    melhor_resultado = len(set(primeira_coloracao))
 
-    if vertices_coloridos == []:
-      vertices_coloridos = numero_vertices * [0]
+    def dsatur_recursao(grafo, melhor_geral, coloracao = [], vertices_coloridos = []):
+      """
+      Função usada nas chamadas recursivas do Dsatur exato, funcionando como o
+      backtracking do algoritmo
+      """
 
-    melhor = melhor_geral
-    melhor_grafo = grafo.copy()
-    coloracao_original = coloracao.copy()
-    vertices_coloridos_original = vertices_coloridos.copy()
-    vertices_n_coloridos = vertices_coloridos.count(0)
-    vertices_tentados = []
-    tentativas_coloracao = 0
-
-    while tentativas_coloracao < vertices_n_coloridos:
-
-      vertices_coloridos = vertices_coloridos_original.copy()
-      coloracao = coloracao_original.copy()
-
-      if coloracao == []:
+      if vertices_coloridos == []:
         vertices_coloridos = numero_vertices * [0]
-        vertices_coloridos_auxiliar = vertices_coloridos
-        grau_saturacao = FuncAux.atualiza_grau_sat(lista_adjacencias, vertices_coloridos)
-        vertice_maior_grau = FuncAux.seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos)
-        cor = {vertice_maior_grau}
-        coloracao = [cor]
-        vertices_coloridos[vertice_maior_grau] = 1
-        grafo.vs[vertice_maior_grau]['cor'] = coloracao.index(cor)
-      else:
-        grau_saturacao = FuncAux.atualiza_grau_sat(lista_adjacencias, vertices_coloridos)
-        vertice_maior_grau = FuncAux.seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos, vertices_tentados)
-        for cor in coloracao:
-          if FuncAux.conjunto_independente(lista_arestas, cor.union({vertice_maior_grau})):
-            cor.add(vertice_maior_grau)
+
+      melhor = melhor_geral
+      melhor_grafo = grafo.copy()
+      coloracao_original = coloracao.copy()
+      vertices_coloridos_original = vertices_coloridos.copy()
+      vertices_n_coloridos = vertices_coloridos.count(0)
+      vertices_tentados = []
+      tentativas_coloracao = 0
+
+      while tentativas_coloracao < vertices_n_coloridos:
+
+        vertices_coloridos = vertices_coloridos_original.copy()
+        coloracao = coloracao_original.copy()
+
+        if coloracao == []:
+          vertices_coloridos = numero_vertices * [0]
+          vertices_coloridos_auxiliar = vertices_coloridos
+          grau_saturacao = FuncAux.atualiza_grau_sat(lista_adjacencias, vertices_coloridos)
+          vertice_maior_grau = FuncAux.seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos)
+          cor = {vertice_maior_grau}
+          coloracao = [cor]
+          vertices_coloridos[vertice_maior_grau] = 1
+          grafo.vs[vertice_maior_grau]['cor'] = coloracao.index(cor)
+        else:
+          grau_saturacao = FuncAux.atualiza_grau_sat(lista_adjacencias, vertices_coloridos)
+          vertice_maior_grau = FuncAux.seleciona_vertice_dsatur(grau_saturacao, vertices_coloridos, vertices_tentados)
+          for cor in coloracao:
+            if FuncAux.conjunto_independente(lista_arestas, cor.union({vertice_maior_grau})):
+              cor.add(vertice_maior_grau)
+              grafo.vs[vertice_maior_grau]['cor'] = coloracao.index(cor)
+              vertices_coloridos[vertice_maior_grau] = 1
+              break
+          if vertices_coloridos[vertice_maior_grau] == 0:
+            cor = {vertice_maior_grau}
+            coloracao.append(cor)
             grafo.vs[vertice_maior_grau]['cor'] = coloracao.index(cor)
             vertices_coloridos[vertice_maior_grau] = 1
-            break
-        if vertices_coloridos[vertice_maior_grau] == 0:
-          cor = {vertice_maior_grau}
-          coloracao.append(cor)
-          grafo.vs[vertice_maior_grau]['cor'] = coloracao.index(cor)
-          vertices_coloridos[vertice_maior_grau] = 1
 
-      qntd_cores = len(coloracao)
+        qntd_cores = len(coloracao)
 
-      if vertices_coloridos.count(1) < numero_vertices and qntd_cores < melhor_geral:
-        melhor, grafo = dsatur_recursao(grafo, melhor_geral, coloracao, vertices_coloridos)
-        vertices_tentados.append(vertice_maior_grau)
-        tentativas_coloracao = tentativas_coloracao+1
-        if melhor < melhor_geral:
-          melhor_geral = melhor
+        if vertices_coloridos.count(1) < numero_vertices and qntd_cores < melhor_geral:
+          melhor, grafo = dsatur_recursao(grafo, melhor_geral, coloracao, vertices_coloridos)
+          vertices_tentados.append(vertice_maior_grau)
+          tentativas_coloracao = tentativas_coloracao+1
+          if melhor < melhor_geral:
+            melhor_geral = melhor
+            melhor_grafo = grafo.copy()
+          continue
+
+        if vertices_coloridos.count(1) == numero_vertices and qntd_cores < melhor_geral:
+          melhor_geral = qntd_cores
           melhor_grafo = grafo.copy()
-        continue
+          return melhor_geral, melhor_grafo
 
-      if vertices_coloridos.count(1) == numero_vertices and qntd_cores < melhor_geral:
-        melhor_geral = qntd_cores
-        melhor_grafo = grafo.copy()
-        return melhor_geral, melhor_grafo
+        if qntd_cores >= melhor:
+          vertices_tentados.append(vertice_maior_grau)
+          tentativas_coloracao = tentativas_coloracao+1
+          continue
 
-      if qntd_cores >= melhor:
-        vertices_tentados.append(vertice_maior_grau)
-        tentativas_coloracao = tentativas_coloracao+1
-        continue
+      return melhor_geral, melhor_grafo
 
-    return melhor_geral, melhor_grafo
+    melhor, grafo = dsatur_recursao(grafo, melhor_resultado)
 
-  melhor, grafo = dsatur_recursao(grafo, melhor_resultado)
-
-  return grafo
+    return grafo
 
 class FuncAux:
   '''
